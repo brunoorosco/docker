@@ -1,6 +1,6 @@
-
 # Use a imagem oficial do Node.js como base
 FROM node:20-alpine as builder
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala as dependências
-RUN npm ci --only=production
+RUN npm i --omit=dev
 
 # Copia o resto dos arquivos do projeto
 COPY . .
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 # Imagem final otimizada
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -31,4 +31,4 @@ COPY --from=builder /app/package.json ./package.json
 EXPOSE 5000
 
 # Comando para iniciar a aplicação
-CMD ["npm","run","build","npm", "start"]
+CMD ["npm", "start"]
